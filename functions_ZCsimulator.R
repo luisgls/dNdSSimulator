@@ -50,6 +50,7 @@ empty_dataframe <- function(p0, ps)
     psurv = NA,
     pimmune = NA,
     clone_id = NA,
+    clone_I_id = NA,
     parent_clone_id = NA,
     stringsAsFactors = FALSE
   ) %>% as_tibble()
@@ -71,6 +72,7 @@ empty_dataframe <- function(p0, ps)
   M$psurv = ps
   M$pimmune = 0
   M$clone_id = 0
+  M$clone_I_id = 0
   M$parent_clone_id = 0
   
   M
@@ -124,7 +126,7 @@ playStrategy <- function(M, id, new_geno, parent_id)
   outcome = chooseStrategy(M, id)
   old_parent_clone_id = M %>% filter(id == !!parent_id) %>% pull(clone_id)
   newclone_id = max(M$clone_id) + 1
-  
+  newclone_I_id = max(M$clone_I_id) + 1
   
   ######################################################################################################################################################
   ############################################# PHENOTYPE 1: Probability of survival ###################################################################
@@ -185,15 +187,16 @@ playStrategy <- function(M, id, new_geno, parent_id)
       if(newval2 < 0) newval2 = 0
       return(newval2)
     }
-    
+    else{
     return(NULL)
+    }
   }
   change_pimmune = Vectorize(change_pimmune, vectorize.args = 'px')
   
   pimmune_parent = M %>% filter(id == !!parent_id) %>% pull(pimmune)
   
   # True or false - is a new clone based on the pimmune phenotype
-  is_new_clone_immune = (new_geno['gnai'] >= 1 | new_geno['gnae'] >= 1) #& pimmune_parent > 0
+  is_new_clone_immune = (new_geno['gnai'] == 1) & pimmune_parent == 0
   
   #modify the phenotype
   M = M %>% 
@@ -205,7 +208,7 @@ playStrategy <- function(M, id, new_geno, parent_id)
     )
   
   
-  is_truly_newclone = is_new_clone_surv #| is_new_clone_immune
+  #is_truly_newclone = is_new_clone_surv #| is_new_clone_immune
   
    ###set new strategy, new clone id and update parent clone id
   M = M %>%
@@ -213,8 +216,9 @@ playStrategy <- function(M, id, new_geno, parent_id)
       ##Strategy should always be updated
       #strategy        = ifelse(id == !!id & is_truly_newclone, outcome, strategy),
       strategy        = ifelse(id == !!id, outcome, strategy),
-      clone_id        = ifelse(id == !!id & is_truly_newclone, newclone_id, clone_id),
-      parent_clone_id = ifelse(id == !!id & is_truly_newclone, old_parent_clone_id, parent_clone_id)
+      clone_id        = ifelse(id == !!id & is_new_clone_surv, newclone_id, clone_id),
+      clone_I_id        = ifelse(id == !!id & is_new_clone_immune, newclone_I_id, clone_I_id),
+      parent_clone_id = ifelse(id == !!id & is_new_clone_surv, old_parent_clone_id, parent_clone_id)
     )
   M
 }
@@ -243,28 +247,29 @@ set_geno = function(M, id, g) {
   M
 }
 
-##Flag a cell as dead because immune attack
+### 3 models for immunogenic attack
+##Kill a cell given a probability of immune attack
 set_immunedead1 = function(M, id, t, patak) {
   M %>%
     mutate(alive = ifelse(id == !!id & gnai > 0 & patak > runif(1) & gnae == 0,  FALSE, alive),
            t_e = ifelse(id == !!id,  t, t_e))
 }
 
-##Flag a cell as dead because immune attack
+##Kill a cell with an increasing probability given a probability of immune attack
 set_immunedead2 = function(M, id, t, patak) {
   M %>%
     mutate(alive = ifelse(id == !!id & pimmune > runif(1) & patak > runif(1) & gnae == 0,  FALSE, alive),
            t_e = ifelse(id == !!id,  t, t_e))
 }
 
-####add function to kill immunogenic population
+####Kill an immunogenic clone given a probability of immune attack
 set_immunedead3 = function(M, t, pattack) {
   
   immunogenic_clones = immunogenic_cloneid(M, !!t)
   table_immunogenic = count_immunogenic_cells(M , !!t)
   
   if (length(immunogenic_clones) > 0 & (!!pattack > runif(1))) {
-    icells=table_immunogenic %>% filter(clone_id %in% immunogenic_clones) %>% pull(count)
+    icells=table_immunogenic %>% filter(clone_I_id %in% immunogenic_clones) %>% pull(count)
     print(paste(icells,
                 paste(
                   paste("killed in Immunogenic clone",immunogenic_clones,sep=" "), paste("at time", !!t, sep=" ")
@@ -273,7 +278,7 @@ set_immunedead3 = function(M, t, pattack) {
     M = M %>%
       mutate(alive = ifelse(
         #(clone_id %in% immunogenic_clones) & (gnai > 0) & (patak > runif(1)),
-        (clone_id %in% immunogenic_clones) & (gnai > 0) & (gnae == 0),
+        (clone_I_id %in% immunogenic_clones) & (gnai > 0) & (gnae == 0),
         FALSE,
         alive
     )
@@ -281,7 +286,7 @@ set_immunedead3 = function(M, t, pattack) {
   }else{
     M = M
    }
-
+return(M)
 }
 
 ##Flag a cell death and set the time of exit pool
@@ -383,8 +388,6 @@ compute_gdnds_d = function(gnad, gnsd) {
   return(dnds_d)
 }
 
-
-
 ##Sample a set of new somatic mutations for a cell
 chooseMuts <- function(M, id, a0, N) {
   pc <- get_prob(M, id)
@@ -430,12 +433,13 @@ simulate_daughter_cell = function(M, parent_id, t, a0, N) {
   # 4) Take new cell id, new genotype, and play the strategy
   M = playStrategy(M, new_cell_id, new_geno, parent_id)
   
-  # 5) Update dnds, dnds_d and dndsi in memory
+  # 5) Update dnds, dnds_d and dndsi in memory and t_e
   M = M %>% 
     mutate(
       dnds = ifelse(id == !!new_cell_id,  compute_dnds(M, new_cell_id), dnds),
       dnds_d = ifelse(id == !!new_cell_id,  compute_dnds_d(M, new_cell_id), dnds_d),
-      dnds_i = ifelse(id == !!new_cell_id,  compute_dnds_i(M, new_cell_id), dnds_i)
+      dnds_i = ifelse(id == !!new_cell_id,  compute_dnds_i(M, new_cell_id), dnds_i),
+      t_e = ifelse(id == !!new_cell_id,  t, t_e)
   )
   
   # 6) Obtain new strategy and if new strategy 
@@ -456,7 +460,7 @@ count_immunogenic_cells = function(M, t) {
       gnai > 0
       # alive
     ) %>%
-    group_by(clone_id) %>%
+    group_by(clone_I_id) %>%
     summarise(count=n())
 }
 
@@ -470,10 +474,195 @@ immunogenic_cloneid = function(M, t) {
       gnai > 0
       # alive
       ) %>%
-    group_by(clone_id) %>%
+    group_by(clone_I_id) %>%
     filter(n() > 50) %>%
-    pull(clone_id) %>%
+    pull(clone_I_id) %>%
     unique()
 }
 
+####Functions for new dnds calculation
+get_t<-function(M,id){
+  time<-M %>% filter(id==!!id) %>% pull(t_0)
+  return(time)
+}
+
+get_daughter_id<-function(M,id){
+  t_parent<-get_t(M,id)
+  t_child<-t_parent+1
+  childid<-M %>% filter(t_0==t_child,parent==!!id,strategy!="Death") %>% pull(id)
+  return(childid)
+}
+
+getrandomid<-function(x){
+  mutid<-runif(x,min=0 ,max=50000000)
+  return(mutid)
+}
+
+assign_newmutids<-function(vector){
+  vector2<-tibble::enframe(vector)
+  vector2<-vector2 %>% mutate(newid=ifelse(value==TRUE,paste(name,as.integer(getrandomid(1)),sep="_"),"NA")) %>% select(newid) %>% filter(newid!="NA") %>% pull(newid)
+  return(vector2)
+}
+
+
+compare_genotypes<-function(paternal,child){
+  oldids=""
+  for (i in 0:10){
+    vector<- (child-paternal > i)
+    newids<-assign_newmutids(vector)
+    oldids=c(oldids,newids)
+  }
+  oldids<-oldids[oldids != ""]
+  oldids<-unique(oldids)
+  return(oldids)
+}
+
+get_fullgenotype<-function(i,MHF){
+  fullgenotype <- paste(MHF %>% filter(cellid %in% i) %>% pull(Mut_IDs),collapse = ":") %>% str_replace_all(.,":+",":")
+  return(fullgenotype)
+}
+
+#####
+get_sequencing<-function(x){
+  
+  M<-x
+  
+  MHF<-tibble( t_0 =NA, cellid = NA, paternalID = NA, Mut_IDs = NA)
+  
+  for(id in 1:length(M$id)){
+    CHILD<-tibble(t_0 = NA, cellid = NA, paternalID = NA, Mut_IDs = NA)
+    t_actual<-get_t(M,id)
+    c_actual<-id
+    
+    #Get paternal genotype
+    paternal_geno<-get_geno(M,id)
+    
+    #Get child genotypes
+    childs<-get_daughter_id(M,id)
+    
+    #Populate new matrix with the information of the daugther and the new mut ids
+    if(length(childs)>0){
+      for (j in childs){
+        child_geno<-get_geno(M,j)
+        newmutsids<-compare_genotypes(paternal = paternal_geno,child = child_geno)
+        CHILD<-tibble(t_0 = t_actual+1, cellid = j, paternalID =  c_actual, Mut_IDs = paste(newmutsids,collapse = ":"))
+        MHF = bind_rows(MHF,CHILD)
+      }
+    }
+  }
+  
+
+  
+  ####### Estimate dN/dS for driver, global and immune at time point T for mutations present in at least 5%, and when population size is more than 100 cells.
+  # Call id the "to" and parent the "from" of each edge
+  M = M %>%
+    mutate(to = id, from = parent)
+  
+  #Example
+  cells = M %>% filter(t_0==max(t_0),strategy!="Death") %>% pull(to)
+  tfinal <- M %>%  filter(t_0==max(t_0)) %>% pull(t_0) %>% unique(.)
+  total  <- length(cells)
+  
+  if(total == 0){
+    print("All cells dead at last time point")
+    final_seq_unfiltered<-NA
+    return(final_seq_unfiltered)
+    next
+  }else{
+    print("Cells are alive in last generation, compute dN/dS")
+  }
+  #Get values for each cell
+  Mad = ctree:::DataFrameToMatrix(M)
+  # 2) Transpose it so that now every edge goes from
+  # child to father
+  t_Mad = t(Mad)
+  # 3)
+  t_M = ctree:::MatrixToDataFrame(t_Mad)
+  ancestors<-lapply(cells, ctree:::reach, df = t_M)
+  
+  sequencing<-""
+  for (a in ancestors){
+    temp_genotype<-get_fullgenotype(a,MHF)
+    sequencing<-paste(sequencing,temp_genotype,sep=":") %>% str_replace_all(.,":+",":")
+  }
+  
+  sequencing_vec<-unlist(strsplit(sequencing, split=":"))
+  
+  final_seq_unfiltered<-as_tibble(table(sequencing_vec)) %>% mutate(frequency=n/total)
+  final_seq_unfiltered<-final_seq_unfiltered %>% mutate(muttype=(ifelse(str_detect(sequencing_vec, 'gna'),"Non-syn","syn")))
+  
+  return(final_seq_unfiltered)
+}
+
+
+calc_freq_dnds<-function(x,sequencing,freq=0.01){
+  summary_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
+                            mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
+                            dnds_driver=NA,dnds_immune=NA,min_freq=NA)
+  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table),]
+  
+  for (i in 1:length(x)){
+    #print(paste("Simulation_nr",i,sep ="_"))
+    #Iterate through simulations
+    M <- x[[i]]
+
+    if(is.na(sequencing[[i]])){ 
+      #print(paste("No Sequencing data in simulation ",i,sep =""))
+      next}
+    #Final table data
+    temp_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
+                           mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
+                           dnds_driver=NA,dnds_immune=NA,min_freq=!!freq)
+    
+    #Assign simulation number
+    temp_dnds_table <- temp_dnds_table %>% mutate(simulation = i)
+    
+    #Define cells to query, time to query, and total population size to query
+    cells = M %>% filter(t_0==max(t_0),strategy!="Death") %>% pull(id)
+    tfinal <- M %>%  filter(t_0==max(t_0)) %>% pull(t_0) %>% unique(.)
+    total  <- length(cells)
+    
+    #If population is extinct do not compute dN/dS
+    if(total == 0){next}
+    
+    #Get matrix of cells and explicit genotypes
+    final_seq_unfiltered<-sequencing[[i]]
+    
+    final_seq<- final_seq_unfiltered %>% filter(frequency>=!!freq)
+    
+    #get_dnds_global
+    na<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gna'))))
+    ns<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gns'))))
+    dnds<-na/(3*ns)
+    
+    #get_dnds_driver
+    nad<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnad'))))
+    nsd<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnsd'))))
+    dndsD<-nad/(3*nsd)
+    
+    #get_dnds_Immune
+    nai<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnai'))))
+    nsi<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnsi'))))
+    dndsI<-nai/(3*nsi)
+    
+    nae<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnae'))))
+    
+    temp_dnds_table = temp_dnds_table %>% mutate(pop = total,
+                                                 time=tfinal,
+                                                 mut_na=na,mut_ns=ns,
+                                                 mut_nad=nad,mut_nsd=nsd,
+                                                 mut_nai=nai,mut_nsi=nsi,
+                                                 mut_nae=nae,
+                                                 dnds_global=dnds,
+                                                 dnds_driver=dndsD,
+                                                 dnds_immune=dndsI,
+                                                 min_freq=freq )
+    
+    
+    summary_dnds_table = bind_rows(summary_dnds_table,temp_dnds_table)
+    
+  }
+  
+  return(summary_dnds_table)
+}
 
