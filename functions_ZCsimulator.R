@@ -500,14 +500,14 @@ getrandomid<-function(x){
   return(mutid)
 }
 
-
+##Assign new mutation ID
 assign_newmutids<-function(vector){
   vector2<-tibble::enframe(vector)
   vector2<-vector2 %>% mutate(newid=ifelse(value==TRUE,paste(name,as.integer(getrandomid(1)),sep="_"),"NA")) %>% select(newid) %>% filter(newid!="NA") %>% pull(newid)
   return(vector2)
 }
 
-
+##Compare genotype of child versus paternal id
 compare_genotypes<-function(paternal,child){
   oldids=""
   for (i in 0:10){
@@ -520,12 +520,13 @@ compare_genotypes<-function(paternal,child){
   return(oldids)
 }
 
+## Obtain full genotype for each cell in the model
 get_fullgenotype<-function(i,MHF){
   fullgenotype <- paste(MHF %>% filter(cellid %in% i) %>% pull(Mut_IDs),collapse = ":") %>% str_replace_all(.,":+",":")
   return(fullgenotype)
 }
 
-#####
+#####Main function to obtain sequencing table
 get_sequencing<-function(x){
   
   M<-x
@@ -556,7 +557,7 @@ get_sequencing<-function(x){
   
 
   
-  ####### Estimate dN/dS for driver, global and immune at time point T for mutations present in at least 5%, and when population size is more than 100 cells.
+  ####### Pull table with mutation ids, number of cells, frequency, and type
   # Call id the "to" and parent the "from" of each edge
   M = M %>%
     mutate(to = id, from = parent)
@@ -597,7 +598,7 @@ get_sequencing<-function(x){
   return(final_seq_unfiltered)
 }
 
-
+## Get frequency dnds
 calc_freq_dnds<-function(x,sequencing,freq=0.01){
   summary_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
                             mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
@@ -668,6 +669,7 @@ calc_freq_dnds<-function(x,sequencing,freq=0.01){
   return(summary_dnds_table)
 }
 
+## Calculate if escape is clonal or subclonal
 calc_clonal_escape<-function(x,sequencing,freq=0.01,escape_freq_min=0.1,escape_freq_max=1){
   summary_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
                             mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
@@ -740,6 +742,7 @@ calc_clonal_escape<-function(x,sequencing,freq=0.01,escape_freq_min=0.1,escape_f
   return(summary_dnds_table)
 }
 
+## Estimate confidence interval for cohort analysis
 calc_freq_ci<-function(x){
   
   sum_x <-
@@ -771,18 +774,21 @@ calc_freq_ci<-function(x){
   return(sum_x)
   }
 
+## Get low CI
 get_lowCI_freq=function(x1,x2,n,m){
   library(dpcR)
   z<-rateratio.test::rateratio.test(c(x1,x2),c(n,m))
   return(z$conf.int[1])
 }
 
+##get High CI
 get_highCI_freq=function(x1,x2,n,m){
   library(dpcR)
   z<-rateratio.test::rateratio.test(c(x1,x2),c(n,m))
   return(z$conf.int[2])
 }
 
+##Set parameters for plotting cohort analysis
 set_params<-function(x,mod,imm,esc){
   x <- x %>% mutate(model=mod,immune=imm,escape=esc)
 }  

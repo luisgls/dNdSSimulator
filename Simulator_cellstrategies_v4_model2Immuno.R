@@ -9,10 +9,10 @@ library(easypar)
 library(parallel)
 
 rm(list = ls())
-source('simulator.R')
+source('simulator_modelB.R')
 source("functions_ZCsimulator.R")
 
-set.seed(12345)
+set.seed(12348)
 ######### Number of repetitions #########
 TASKS = 100
 
@@ -54,7 +54,7 @@ params['pns']  <- 0.25 - ( params['pnsi'] +  params['pnsd']) #Synonymous mutatio
 ####################################################################################################################
 
 #######Set mutation probabilities
-params['pnad'] <- 0.005 #Nonsyn - driver mutations (increase proliferation rate, oncogenes/ reduce correction efficiency, mut_modifiers, decrease death rate)
+params['pnad'] <- 0.01 #Nonsyn - driver mutations (increase proliferation rate, oncogenes/ reduce correction efficiency, mut_modifiers, decrease death rate)
 params['pnai'] <- 0.05 #Nonsyn - deleterious mutations (immunogenic mutations)
 params['pnak'] <- 0.00 #Nonsyn - deleterious mutations (death)
 params['pnae'] <- 0.000 #Nonsyn - escape immune system mutations
@@ -73,14 +73,14 @@ RUNS = run(
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
 
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_00_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_00_driver_01_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
 ####################################################################################################################
 ###Driver plus 5% immunogenic + pattack 5%
 
-params['pnad'] <- 0.005 #Nonsyn - driver mutations (increase proliferation rate, oncogenes/ reduce correction efficiency, mut_modifiers, decrease death rate)
+params['pnad'] <- 0.01 #Nonsyn - driver mutations (increase proliferation rate, oncogenes/ reduce correction efficiency, mut_modifiers, decrease death rate)
 params['pnai'] <- 0.05 #Nonsyn - deleterious mutations (immunogenic mutations)
 params['pnak'] <- 0.00 #Nonsyn - deleterious mutations (death)
 params['pnae'] <- 0.00 #Nonsyn - escape immune system mutations
@@ -99,7 +99,7 @@ RUNS = run(
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
 
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_05_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_05_driver_01_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -116,7 +116,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_25_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_25_driver_01_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -133,7 +133,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_50_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_50_driver_01_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -150,7 +150,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_75_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_75_driver_01_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -167,13 +167,13 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_95_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_95_driver_01_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
 ####################################################################################################################
 
-params['pattack'] <- 0.99
+params['pattack'] <- 1
 
 PARAMS_RUN82 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
@@ -183,16 +183,12 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_100_driver_01_IM_05.RData")
 
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
 ####################################################################################################################
-####################################################################################################################
-################################ New simulation ####################################################################
-####################################################################################################################
-
 
 
 params['pnad'] <- 0.001 #Nonsyn - driver mutations (increase proliferation rate, oncogenes/ reduce correction efficiency, mut_modifiers, decrease death rate)
@@ -213,7 +209,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_01_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_01_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.25
 
@@ -225,7 +221,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_25_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_25_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.50
 
@@ -237,7 +233,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_50_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_50_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.75
 
@@ -249,7 +245,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_75_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_75_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.99
 
@@ -261,13 +257,8 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_001_IM_05.RData")
-
-
-
-####################################################################################################################
-################################ New simulation ####################################################################
-####################################################################################################################
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_001_IM_05.RData")
+set.seed(102)
 ####################################################################################################################
 ################################ New simulation ####################################################################
 ####################################################################################################################
@@ -283,6 +274,7 @@ params['pattack'] <- 0.99
 
 
 params['pnae'] <- 0.0001
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN869 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -291,10 +283,11 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_0001.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_01_IM_05_E_0001.RData")
 
 
 params['pnae'] <- 0.001
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN870 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -303,9 +296,10 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_001.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_01_IM_05_E_001.RData")
 
 params['pnae'] <- 0.005
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN871 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -314,9 +308,10 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_005.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_01_IM_05_E_005.RData")
 
 params['pnae'] <- 0.01
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN872 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -325,10 +320,11 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_01.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_01_IM_05_E_01.RData")
 
 
 params['pnae'] <- 0.05
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN873 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -337,10 +333,11 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_01_IM_05_E_05.RData")
 
 
 params['pnae'] <- 0.1
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN874 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -349,4 +346,4 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_10.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations6/MSS_IA_99_driver_01_IM_05_E_10.RData")

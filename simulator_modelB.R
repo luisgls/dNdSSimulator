@@ -1,3 +1,6 @@
+###Zapata Luis, Caravagna Giulio 2019
+# ###Simulation of Population growth, dNdS and mutation accumulation based on probabilities 
+
 ##Main simulator function to repeat multiple times given a set of paramteres
 simulator = function(list_params)
   {

@@ -2,11 +2,11 @@
 title: "Manuscript Results Simulation"
 author: "Luis Zapata"
 output:
-  pdf_document: default
   html_document:
-    theme: paper
-    df_print: paged
+    #theme: paper
+    #df_print: paged
     #highlight: tango
+  pdf_document: default
 ---
 
 #Results: Evolutionary dynamics of dN/dS under neutral evolution
@@ -21,8 +21,6 @@ so you can have global dnds values of 2 or 0.5 and still are neutral.
 s
 
 4. Even in neutral evolving populations mutations accumulate
-
-5. The co
 
 To understand the dynamics of dN/dS values over time we first simulated a branching process with only neutral mutations (non-synonymous passenger and synonymous mutations) (Fig 2) in a initial population of 32 stem cells. We classified each simulations into three scenarios based on their outcome at the last simulated step: ongoing, extinction and saturation, which are equivalent to an homeostatic, a regressing and an emergent tumor population, respectively. As described previously (X) and expected by equation X, the neutral dynamics produced an homeostatic  population of 32 cells over time accross 100 simulations (Fig 2A).
 
@@ -45,7 +43,7 @@ library(ggpubr)
 library(RColorBrewer)
 rm(list = ls())
 source("functions_ZCsimulator.R")
-source("simulator.R")
+source("simulator_plotting.R")
 ```
 
 ```{r, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE}
@@ -82,8 +80,8 @@ fulltime_neutral$class <- factor(fulltime_neutral$class, levels = c("MSS","MSI",
 fulltimeevo_neutral<-rbind(fulltimeevo1,fulltimeevo2,fulltimeevo3)
 fulltimeevo_neutral$class <- factor(fulltimeevo_neutral$class, levels = c("MSS","MSI","POLE"))
 
-pptneu<-plot_metric_class(fulltime_neutral, maxt = 50, maintitle = "2A. Neutral dynamics")
-plot_metric_classevo(fulltimeevo_neutral, maxt = 50, maintitle = "2B. Neutral dynamics. N0 32 cells")
+pptneu<-plot_metric_class(fulltime_neutral, maxt = 30, maintitle = "2A. Neutral dynamics")
+plot_metric_classevo(fulltimeevo_neutral, maxt = 100, maintitle = "2B. Neutral dynamics. N0 32 cells")
 
 
 #ggsave(filename = "~/Desktop/neutral_population.pdf", pptneu, width = 30, height = 15, units = "cm")
@@ -148,163 +146,4 @@ plot_metric_classevo(fulltime_driver, maintitle = "Only Drivers")
 
 ```
 
-#Drivers and immune system
-
-```{r, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE}
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_00_driver_01_IM_05.RData")
-fulltimeseries_i0 = stats_dnds(RUNS)
-fulltimeevo_i0 = evodevo(RUNS, 8, 500)
-fulltimeevo_i0$class = "I:0"
-#plot_threeV4(fulltimeseries, maintitle = "Driver .01 / Immunogenic .05 / No Immune attack")
-#plot_threeV3(fulltimeevo, maintitle = "Driver .01 / Immunogenic .05 / No Immune attack")
-#M<-RUNS[[4]]
-#mullerplot(M,add_clone_tree = F)
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_05_driver_01_IM_05.RData")
-fulltimeseries_i1 = stats_dnds(RUNS)
-fulltimeevo_i1 = evodevo(RUNS, 8, 500)
-fulltimeevo_i1$class = "I:0.05"
-
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_25_driver_01_IM_05.RData")
-fulltimeseries_i2 = stats_dnds(RUNS)
-fulltimeevo_i2 = evodevo(RUNS, 8, 500)
-fulltimeevo_i2$class = "I:0.25"
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_50_driver_01_IM_05.RData")
-fulltimeseries_i3 = stats_dnds(RUNS)
-fulltimeevo_i3 = evodevo(RUNS, 8, 500)
-fulltimeevo_i3$class = "I:0.50"
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_75_driver_01_IM_05.RData")
-fulltimeseries_i4 = stats_dnds(RUNS)
-fulltimeevo_i4 = evodevo(RUNS, 8, 500)
-fulltimeevo_i4$class = "I:0.75"
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_90_driver_01_IM_05.RData")
-fulltimeseries_i5 = stats_dnds(RUNS)
-fulltimeevo_i5 = evodevo(RUNS, 8, 500)
-fulltimeevo_i5$class = "I:0.90"
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_01_IM_05.RData")
-fulltimeseries_i6 = stats_dnds(RUNS)
-fulltimeevo_i6 = evodevo(RUNS, 8, 500)
-fulltimeevo_i6$class = "I:0.99"
-
-
-fulltimeevo_immuno <- rbind(fulltimeevo_i0,fulltimeevo_i1,fulltimeevo_i2,fulltimeevo_i3,fulltimeevo_i4,fulltimeevo_i5,fulltimeevo_i6)
-fulltimeevo_immuno = fulltimeevo_immuno %>% mutate(class2 = ifelse(class %in% c("I:0.99","I:0.95","I:0.90","I:0.75") , "HIGH", ifelse(class %in% c("I:0.25","I:0.10","I:0.05","I:0.01"), "LOW", "MID") ) )
-
-fulltimeevo_immuno$class2 <- factor(fulltimeevo_immuno$class2, levels = c("LOW","MID","HIGH"))
-
-plot_metric_classevo(fulltimeevo_immuno)
-
-plot_statistic_clasevo1(fulltimeevo_immuno)
-
-plot_statistic_clasevo2(fulltimeevo_immuno)
-
-ggstatsplot::grouped_ggbetweenstats(data = fulltimeevo_immuno %>% filter(event != "Ongoing"), 
-                                    x = class,
-                                    y = time,
-                                    grouping.var =  event,
-                                    type = "np",
-                                    pairwise.comparisons = T
-                                    )
-
-
-ggstatsplot::grouped_ggbetweenstats(data = fulltimeevo_immuno%>% filter(event != "Ongoing",!is.infinite(fin_dndsi)),
-                            x = class, 
-                            y = fin_dnds,plot.type = "violin", type = "np", bf.message = F, notch = T, linetype = "dashed", outlier.shape = NA,messages = F,p.adjust.method = "BH",mean.plotting = T,mean.size = 4,grouping.var = event)
-ggstatsplot::grouped_ggbetweenstats(data = fulltimeevo_immuno%>% filter(event != "Ongoing",!is.infinite(fin_dndsi)),
-                            x = class, 
-                            y = fin_dndsd, plot.type = "violin", type = "np", bf.message = F, notch = T, linetype = "dashed", outlier.shape = NA,messages = F,p.adjust.method = "BH",mean.plotting = T,mean.size = 4,grouping.var = event)
-ggstatsplot::grouped_ggbetweenstats(data = fulltimeevo_immuno%>% filter(event != "Ongoing",!is.infinite(fin_dndsi)),
-                            x = class, 
-                            y = fin_dndsi, plot.type = "violin", type = "np", bf.message = F, notch = T, linetype = "dashed", outlier.shape = NA,messages = F,p.adjust.method = "BH",mean.plotting = T,mean.size = 4,grouping.var = event
-                              )
-
-ggscatter(fulltimeevo_immuno %>% filter(event=="Collapse"),x = "fin_dnds", y = "time") 
-```
-
-
-```{r, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE}
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_01_IM_05_E_0001.RData")
-fulltimeseries_e1 = stats_dnds(RUNS)
-fulltimeevo_e1 = evodevo(RUNS, 8, 500)
-fulltimeevo_e1$class = "E:0.0001"
-
-# plot_threeV4(fulltimeseries, maintitle = "Driver .01 / Immunogenic .05 / 99% Immune attack / Escape .01")
-# plot_threeV3(fulltimeevo, maintitle = "Driver .01 / Immunogenic .05 / 99% Immune attack / Escape .01")
-# 
-# M<-RUNS[[4]]
-# mullerplot(M,add_clone_tree = F)
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_01_IM_05_E_001.RData")
-fulltimeseries_e2 = stats_dnds(RUNS)
-fulltimeevo_e2 = evodevo(RUNS, 8, 500)
-fulltimeevo_e2$class = "E:0.001"
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_01_IM_05_E_005.RData")
-fulltimeseries_e3 = stats_dnds(RUNS)
-fulltimeevo_e3 = evodevo(RUNS, 8, 500)
-fulltimeevo_e3$class = "E:0.005"
-
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_01_IM_05_E_01.RData")
-fulltimeseries_e4 = stats_dnds(RUNS)
-fulltimeevo_e4 = evodevo(RUNS, 8, 500)
-fulltimeevo_e4$class = "E:0.01"
-
-
-#load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_01_IM_05_E_05.RData")
-#fulltimeseries_e5 = stats_dnds(RUNS)
-#fulltimeevo_e5 = evodevo(RUNS, 8, 500)
-#fulltimeevo_e5$class = "E:0.05"
-
-
-fulltimeevo_escape1 <- rbind(fulltimeevo_e1,fulltimeevo_e2,fulltimeevo_e3,fulltimeevo_e4)
-fulltimeevo_escape1$class2<-fulltimeevo_escape1$class
-plot_metric_classevo(fulltimeevo_escape1)
-plot_statistic_clasevo1(fulltimeevo_escape1)
-# plot_threeV4(fulltimeseries, maintitle = "Driver .01 / Immunogenic .05 / 99% Immune attack / Escape .05")
-# plot_threeV3(fulltimeevo, maintitle = "Driver .01 / Immunogenic .05 / 99% Immune attack / Escape .05")
-# 
-# M<-RUNS[[4]]
-# mullerplot(M,add_clone_tree = F)
-#dnds_plot(M)
-#plot_clone_dnds(M)
-```
-
-
-```{r, message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE}
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_001_IM_02_E_01.RData")
-fulltimeseries_e4 = stats_dnds(RUNS)
-fulltimeevo_e4 = evodevo(RUNS, 8, 500)
-fulltimeevo_e4$class = "D:0.001;E:0.01;I:0.02"
-# plot_threeV4(fulltimeseries, maintitle = "Driver .001 / Immunogenic .02 / 99% Immune attack / Escape .01")
-# plot_threeV3(fulltimeevo, maintitle = "Driver .001 / Immunogenic .02 / 99% Immune attack / Escape .01")
-# 
-# M<-RUNS[[7]]
-# mullerplot(M,add_clone_tree = F)
-#dnds_plot(M)
-#plot_clone_dnds(M)
-                
-load(file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_001_IM_02_E_05.RData")
-fulltimeseries_e5 = stats_dnds(RUNS)
-fulltimeevo_e5 = evodevo(RUNS, 8, 500)
-fulltimeevo_e5$class = "D:0.001;E:0.05;I:0.02"
-
-fulltimeevo_escape3 <-rbind(fulltimeevo_e4,fulltimeevo_e5)
-fulltimeevo_escape3$class2<-fulltimeevo_escape3$class
-plot_metric_classevo(fulltimeevo_escape3)
-plot_statistic_clasevo1(fulltimeevo_escape3)
-# plot_threeV4(fulltimeseries, maintitle = "Driver .001 / Immunogenic .02 / 99% Immune attack / Escape .05")
-# plot_threeV3(fulltimeevo, maintitle = "Driver .001 / Immunogenic .02 / 99% Immune attack / Escape .05")
-# 
-# M<-RUNS[[4]]
-# mullerplot(M,add_clone_tree = F)
-#dnds_plot(M)
-#plot_clone_dnds(M)
-                
-
-```
-
+#

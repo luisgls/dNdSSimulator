@@ -9,17 +9,17 @@ library(easypar)
 library(parallel)
 
 rm(list = ls())
-source('simulator.R')
+source('simulator_modelA.R')
 source("functions_ZCsimulator.R")
 
-set.seed(12345)
+set.seed(12346)
 ######### Number of repetitions #########
 TASKS = 100
 
 ######## Define our set of parameters for the SIESTA model ###########
 params = NULL
 
-####Define initial population size
+####Define initial population size 2^n
 params['n0'] <- 5
 
 ######## Global parameters #########
@@ -31,7 +31,7 @@ params['ps'] <- 0.5
 params['pdiff'] <- (1 - params['ps'])
 
 ######Set mutation occurrence parameters
-params['u'] = 1 /  (10 ^ 6) #muts/ p divisionm / p bp, ##mutation occurrence/ polymerase error
+params['u'] = 1 /  (10 ^ 6) #muts/ p divisionm / p bp, ##mutation occurrence/polymerase error
 params['L'] = 50 * (10 ^ 6) ###Length of the genome/exome size of exome syn plus nonsyn mutations
 params['C'] = 1 /  (10 ^ 2) #correction efficiency, it allows only 1 out of X number of mutations to be preserved at each cell division
 
@@ -73,7 +73,7 @@ RUNS = run(
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
 
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_00_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_00_driver_005_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -99,7 +99,7 @@ RUNS = run(
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
 
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_05_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_05_driver_005_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -116,7 +116,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_25_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_25_driver_005_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -133,7 +133,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_50_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_50_driver_005_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -150,7 +150,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_75_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_75_driver_005_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -167,7 +167,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_95_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_95_driver_005_IM_05.RData")
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
@@ -183,7 +183,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_005_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_005_IM_05.RData")
 
 
 ####################################################################################################################
@@ -213,7 +213,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_01_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_01_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.25
 
@@ -225,7 +225,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_25_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_25_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.50
 
@@ -237,7 +237,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_50_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_50_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.75
 
@@ -249,7 +249,7 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_75_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_75_driver_001_IM_05.RData")
 
 params['pattack'] <- 0.99
 
@@ -261,13 +261,15 @@ RUNS = run(
   parallel = TRUE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
-save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations3/MSS_IA_99_driver_001_IM_05.RData")
+save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_001_IM_05.RData")
 
 
 
 ####################################################################################################################
 ################################ New simulation ####################################################################
 ####################################################################################################################
+
+set.seed(101)
 ####################################################################################################################
 ################################ New simulation ####################################################################
 ####################################################################################################################
@@ -283,6 +285,8 @@ params['pattack'] <- 0.99
 
 
 params['pnae'] <- 0.0001
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
+
 PARAMS_RUN869 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -295,6 +299,8 @@ save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/M
 
 
 params['pnae'] <- 0.001
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
+
 PARAMS_RUN870 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -306,6 +312,8 @@ RUNS = run(
 save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_001.RData")
 
 params['pnae'] <- 0.005
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
+
 PARAMS_RUN871 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -317,6 +325,8 @@ RUNS = run(
 save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/MSS_IA_99_driver_01_IM_05_E_005.RData")
 
 params['pnae'] <- 0.01
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
+
 PARAMS_RUN872 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -329,6 +339,7 @@ save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/M
 
 
 params['pnae'] <- 0.05
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN873 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,
@@ -341,6 +352,7 @@ save(RUNS, file="~/Dropbox (Personal)/Postdoc/Projects/simul_dnds/simulations4/M
 
 
 params['pnae'] <- 0.1
+params['pnap'] <- 0.75 - ( params['pnad'] +  params['pnai'] +  params['pnae'] +  params['pnak'])
 PARAMS_RUN874 = lapply(1:TASKS,function(w)  list(params))
 RUNS = run(
   FUN = simulator,

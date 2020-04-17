@@ -1,4 +1,5 @@
-
+###Zapata Luis, Caravagna Giulio 2019
+# ###Simulation of Population growth, dNdS and mutation accumulation based on probabilities 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # Plotting functions
