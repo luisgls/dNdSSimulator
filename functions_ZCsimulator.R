@@ -486,6 +486,7 @@ get_t<-function(M,id){
   return(time)
 }
 
+###Obtain the daugther ID
 get_daughter_id<-function(M,id){
   t_parent<-get_t(M,id)
   t_child<-t_parent+1
@@ -493,10 +494,12 @@ get_daughter_id<-function(M,id){
   return(childid)
 }
 
+##Obtain a random ID
 getrandomid<-function(x){
   mutid<-runif(x,min=0 ,max=50000000)
   return(mutid)
 }
+
 
 assign_newmutids<-function(vector){
   vector2<-tibble::enframe(vector)
@@ -599,14 +602,13 @@ calc_freq_dnds<-function(x,sequencing,freq=0.01){
   summary_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
                             mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
                             dnds_driver=NA,dnds_immune=NA,min_freq=NA)
-  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table),]
   
   for (i in 1:length(x)){
     #print(paste("Simulation_nr",i,sep ="_"))
     #Iterate through simulations
     M <- x[[i]]
 
-    if(is.na(sequencing[[i]])){ 
+    if(unique(is.na(sequencing[[i]][1]))){ 
       #print(paste("No Sequencing data in simulation ",i,sep =""))
       next}
     #Final table data
@@ -631,21 +633,21 @@ calc_freq_dnds<-function(x,sequencing,freq=0.01){
     final_seq<- final_seq_unfiltered %>% filter(frequency>=!!freq)
     
     #get_dnds_global
-    na<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gna'))))
-    ns<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gns'))))
+    na<-as.integer(count(final_seq %>% rename(n_cells=n) %>% filter(str_detect(sequencing_vec, 'gna'))))
+    ns<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gns'))))
     dnds<-na/(3*ns)
     
     #get_dnds_driver
-    nad<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnad'))))
-    nsd<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnsd'))))
+    nad<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnad'))))
+    nsd<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnsd'))))
     dndsD<-nad/(3*nsd)
     
     #get_dnds_Immune
-    nai<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnai'))))
-    nsi<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnsi'))))
+    nai<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnai'))))
+    nsi<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnsi'))))
     dndsI<-nai/(3*nsi)
     
-    nae<-as.integer(count(final_seq %>% filter(str_detect(sequencing_vec, 'gnae'))))
+    nae<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnae'))))
     
     temp_dnds_table = temp_dnds_table %>% mutate(pop = total,
                                                  time=tfinal,
@@ -662,7 +664,125 @@ calc_freq_dnds<-function(x,sequencing,freq=0.01){
     summary_dnds_table = bind_rows(summary_dnds_table,temp_dnds_table)
     
   }
-  
+  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table),]
   return(summary_dnds_table)
 }
 
+calc_clonal_escape<-function(x,sequencing,freq=0.01,escape_freq_min=0.1,escape_freq_max=1){
+  summary_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
+                            mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
+                            dnds_driver=NA,dnds_immune=NA,min_freq=NA)
+  
+  for (i in 1:length(x)){
+    #print(paste("Simulation_nr",i,sep ="_"))
+    #Iterate through simulations
+    M <- x[[i]]
+    
+    if(unique(is.na(sequencing[[i]][1]))){ 
+      #print(paste("No Sequencing data in simulation ",i,sep =""))
+      next}
+    #Final table data
+    temp_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
+                           mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
+                           dnds_driver=NA,dnds_immune=NA,min_freq=!!freq)
+    
+    #Assign simulation number
+    temp_dnds_table <- temp_dnds_table %>% mutate(simulation = i)
+    
+    #Define cells to query, time to query, and total population size to query
+    cells = M %>% filter(t_0==max(t_0),strategy!="Death") %>% pull(id)
+    tfinal <- M %>%  filter(t_0==max(t_0)) %>% pull(t_0) %>% unique(.)
+    total  <- length(cells)
+    
+    #If population is extinct do not compute dN/dS
+    if(total == 0){next}
+    
+    #Get matrix of cells and explicit genotypes
+    final_seq_unfiltered<-sequencing[[i]]
+    
+    final_seq<- final_seq_unfiltered %>% filter(frequency>=!!freq)
+  
+    max_freq_escape<- unique(final_seq_unfiltered %>% filter(.,str_detect(sequencing_vec,"gnae")) %>% filter(frequency==max(frequency)) %>% pull(frequency))
+  
+    if(max_freq_escape>=escape_freq_min & max_freq_escape<escape_freq_max){
+      #get_dnds_global
+      na<-as.integer(count(final_seq %>% rename(n_cells=n) %>% filter(str_detect(sequencing_vec, 'gna'))))
+      ns<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gns'))))
+      dnds<-na/(3*ns)
+      
+      #get_dnds_driver
+      nad<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnad'))))
+      nsd<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnsd'))))
+      dndsD<-nad/(3*nsd)
+      
+      #get_dnds_Immune
+      nai<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnai'))))
+      nsi<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnsi'))))
+      dndsI<-nai/(3*nsi)
+      
+      nae<-as.integer(count(final_seq %>% rename(n_cells=n) %>%filter(str_detect(sequencing_vec, 'gnae'))))
+      temp_dnds_table = temp_dnds_table %>% mutate(pop = total,
+                                                   time=tfinal,
+                                                   mut_na=na,mut_ns=ns,
+                                                   mut_nad=nad,mut_nsd=nsd,
+                                                   mut_nai=nai,mut_nsi=nsi,
+                                                   mut_nae=nae,
+                                                   dnds_global=dnds,
+                                                   dnds_driver=dndsD,
+                                                   dnds_immune=dndsI,
+                                                   min_freq=freq )
+      
+      
+      summary_dnds_table = bind_rows(summary_dnds_table,temp_dnds_table)
+    }else{next}
+  }
+  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table),]
+  return(summary_dnds_table)
+}
+
+calc_freq_ci<-function(x){
+  
+  sum_x <-
+    x %>% dplyr::group_by(immune, escape, min_freq) %>% dplyr::summarise(
+      sum_na  = sum(mut_na),
+      sum_ns  = sum(mut_ns),
+      sum_nad = sum(mut_nad),
+      sum_nsd = sum(mut_nsd),
+      sum_nai = sum(mut_nai),
+      sum_nsi = sum(mut_nsi),
+      sum_nae = sum(mut_nae),
+      count = n(),
+      dnds_global = (sum(mut_na) /
+                       (3 * sum(mut_ns))),
+      dnds_g_low = get_lowCI_freq(sum_na,3*sum_ns,count,count),
+      dnds_g_high = get_highCI_freq(sum_na,3*sum_ns,count,count),
+      
+      dnds_driver = (sum(mut_nad) /
+                       (3 * sum(mut_nsd))),
+      dnds_d_low = get_lowCI_freq(sum_nad,3*sum_nsd,count,count),
+      dnds_d_high = get_highCI_freq(sum_nad,3*sum_nsd,count,count),
+      dnds_immune = (sum(mut_nai) /
+                       (3 * sum(mut_nsi))),
+      dnds_i_low = get_lowCI_freq(sum_nai,3*sum_nsi,count,count),
+      dnds_i_high = get_highCI_freq(sum_nai,3*sum_nsi,count,count),
+      freq = mean(min_freq)
+    )
+  
+  return(sum_x)
+  }
+
+get_lowCI_freq=function(x1,x2,n,m){
+  library(dpcR)
+  z<-rateratio.test::rateratio.test(c(x1,x2),c(n,m))
+  return(z$conf.int[1])
+}
+
+get_highCI_freq=function(x1,x2,n,m){
+  library(dpcR)
+  z<-rateratio.test::rateratio.test(c(x1,x2),c(n,m))
+  return(z$conf.int[2])
+}
+
+set_params<-function(x,mod,imm,esc){
+  x <- x %>% mutate(model=mod,immune=imm,escape=esc)
+}  
