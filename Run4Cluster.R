@@ -9,7 +9,7 @@ library(easypar)
 library(parallel)
 
 rm(list = ls())
-source('~/tools/dNdSSimulator/simulator_modelA.R')
+source("~/tools/dNdSSimulator/simulator_modelA.R")
 source("~/tools/dNdSSimulator/functions_ZCsimulator.R")
 
 #set.seed(12345)
@@ -25,7 +25,7 @@ params = NULL
 params['n0'] <- 5
 
 ######## Global parameters #########
-params['GENERATIONS'] = 100
+params['GENERATIONS'] = 50
 params['Kcapacity'] = 1000
 
 #######Set probability of cell survival
@@ -56,13 +56,19 @@ RUNS = run(
   FUN = simulator,
   PARAMS = PARAMS_RUN1,
   silent = FALSE,
-  parallel = TRUE,
+  parallel = FALSE,
   packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
 )
 
-save(RUNS, file=paste(dummy,"simulation.RData",sep="."))
+RUNS.df = plyr::ldply(RUNS, as.data.frame)
+write.csv(RUNS.df, file = paste(dummy,"simulation_TABLE.csv",sep="_"), row.names = F, quote = F)
+
+#save(RUNS, file=paste(dummy,"simulation.RData",sep="."))
 all_genotypes<-lapply(RUNS,get_sequencing)
-save(all_genotypes, file=paste(dummy,"simulation_SEQ.RData",sep="."))
+SEQ.df = plyr::ldply(all_genotypes, as.data.frame)
+write.csv(SEQ.df, file = paste(dummy,"simulation_SEQ.csv",sep="_"), row.names = F, quote = F)
+
+#save(all_genotypes, file=paste(dummy,"simulation_SEQ.RData",sep="."))
 
 # 
 # PARAMS_DT<-Reduce(bind_rows, lapply(PARAMS_RUN1, data.frame))
