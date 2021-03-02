@@ -8,7 +8,7 @@ dNdS Simulator uses R to simulate a stochastic branching process with a set of g
 We must first clone our repository, load libraries and functions for the simulation:
 
 ```{bash clone,eval=F}
-git clone github.com/luisgls/dNdSSimulator .
+git clone https://github.com/luisgls/dNdSSimulator.git
 ```
 
 ```{r dependencies, message=F}
