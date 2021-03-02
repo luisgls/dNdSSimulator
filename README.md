@@ -1,22 +1,3 @@
----
-title: "Tutorial for immunoediting model of selection using dN/dS"
-author: "Luis Zapata"
-date: "`r Sys.Date()`"
-output:
-  rmarkdown::html_vignette:
-    fig_width: 18
-    fig_height: 12
-    fig.align: 'center'
-    fig.asp: 0.618
-    dpi: 300
-    toc: true
-    warning: FALSE
-    message: FALSE
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
 
 # dNdSSimulator
 dNdS Simulator uses R to simulate a stochastic branching process with a set of genotypes and phenotypes per cell. The main advantage of the model is that simulates immunoediting by introducing immunogenic and escape mutations as well as driver and passenger mutations.
