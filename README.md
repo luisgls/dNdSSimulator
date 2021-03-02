@@ -17,18 +17,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE, echo=F}
-# show me all columns
-options(tibble.width = Inf, pillar.bold = TRUE, pillar.subtle_num = TRUE)
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  dpi = 300,
-  warning = FALSE,
-  message = FALSE,
-  out.width = "100%",
-  comment = "#>"
-)
-```
 
 # dNdSSimulator
 dNdS Simulator uses R to simulate a stochastic branching process with a set of genotypes and phenotypes per cell. The main advantage of the model is that simulates immunoediting by introducing immunogenic and escape mutations as well as driver and passenger mutations.
