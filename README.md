@@ -127,4 +127,4 @@ https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial_files/figure-h
 
 If you want to use the simulator please cite the following article: 
 
-<https://www.biorxiv.org/content/10.1101/2020.07.21.215038v1.full>
+<https://www.biorxiv.org/content/10.1101/2020.07.21.215038v2>
