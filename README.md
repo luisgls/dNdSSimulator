@@ -23,6 +23,9 @@ source('simulator_modelA.R')
 source("functions_ZCsimulator.R")
 source("simulator_plotting.R")
 ```
+*Note*:
+pio, easypar can be obtained from github.com/caravagn/
+
 ## Running one simulation
 
 As an example, we will run the simulator using the following paramters:
