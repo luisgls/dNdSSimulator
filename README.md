@@ -116,4 +116,6 @@ We now can also plot the results using the following function:
 
   p1
 ```
+which produces the following figure:|
 
+https://github.com/luisgls/dNdSSimulator/dNdSTutorial_files/figure-html/visualize-1.png
