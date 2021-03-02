@@ -123,3 +123,8 @@ which produces the following figure:
 
 https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial_files/figure-html/visualize-1.png
 
+## Citation
+
+If you want to use the simulator please cite the following article: 
+
+<https://www.biorxiv.org/content/10.1101/2020.07.21.215038v1.full>
