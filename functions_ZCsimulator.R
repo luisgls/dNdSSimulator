@@ -629,7 +629,7 @@ calc_freq_dnds<-function(x,sequencing,freq=0.01){
     if(total == 0){next}
     
     #Get matrix of cells and explicit genotypes
-    final_seq_unfiltered<-sequencing[[i]]
+    final_seq_unfiltered<-dplyr::as_tibble(sequencing[[i]])
     
     final_seq<- final_seq_unfiltered %>% filter(frequency>=!!freq)
     
@@ -702,10 +702,12 @@ calc_clonal_escape<-function(x,sequencing,freq=0.01,escape_freq_min=0.1,escape_f
     #Get matrix of cells and explicit genotypes
     final_seq_unfiltered<-sequencing[[i]]
     
-    final_seq<- final_seq_unfiltered %>% filter(frequency>=!!freq)
+    final_seq<- dplyr::as_tibble(final_seq_unfiltered %>% filter(frequency>=!!freq))
   
     max_freq_escape<- unique(final_seq_unfiltered %>% filter(.,str_detect(sequencing_vec,"gnae")) %>% filter(frequency==max(frequency)) %>% pull(frequency))
   
+    if(purrr::is_empty(max_freq_escape)){next}
+    
     if(max_freq_escape>=escape_freq_min & max_freq_escape<escape_freq_max){
       #get_dnds_global
       na<-as.integer(count(final_seq %>% rename(n_cells=n) %>% filter(str_detect(sequencing_vec, 'gna'))))
@@ -738,7 +740,7 @@ calc_clonal_escape<-function(x,sequencing,freq=0.01,escape_freq_min=0.1,escape_f
       summary_dnds_table = bind_rows(summary_dnds_table,temp_dnds_table)
     }else{next}
   }
-  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table),]
+  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table[,1]),]
   return(summary_dnds_table)
 }
 
