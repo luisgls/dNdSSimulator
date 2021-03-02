@@ -12,7 +12,7 @@ simulator = function(list_params)
   library(easypar)
   library(parallel)
   
-  source("/Users/lzapata/tools/dNdSSimulator/functions_ZCsimulator.R")
+  source("functions_ZCsimulator.R")
   ###Initital number of cell
   n0 = list_params['n0']
   

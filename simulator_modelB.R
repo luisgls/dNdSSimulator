@@ -48,7 +48,7 @@ simulator = function(list_params)
   p0 <- c(pnad , pnap , pnai , pnae , pnak , pns , pnsi, pnsd)
   
   #Initialize empty data frame
-  M <- initial_state(p0, ps, n0)
+  M <- initial_state(as.list(p0), ps, n0)
   
   ####Program
   #pb = txtProgressBar(min = 0, max = GENERATIONS, style = 3)
