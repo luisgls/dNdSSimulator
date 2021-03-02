@@ -73,13 +73,7 @@ Now that we have defined the parameters for the simulation, we will run one simu
 M<-simulator(params)
 ```
 
-The output is the following
-
-```{r}
-M
-```
-
-That contains the following information for each single cell:
+The output contains the following information for each single cell:
 
 ```{r eval=F}
 id  #cell id
@@ -119,3 +113,4 @@ We now can also plot the results using the following function:
 
   p1
 ```
+
