@@ -14,7 +14,6 @@ git clone https://github.com/luisgls/dNdSSimulator.git
 ```{r dependencies, message=F}
 library(ggpubr)
 library(tidyverse)
-library(ggmuller)
 library(crayon)
 library(pio)
 library(easypar)
@@ -99,10 +98,39 @@ clone_id # Clone id assigned by driver status
 clone_I_id # Clone id assigned by immunogenic status
 parent_clone_id # Parental clone ID (driver status)
 ```
+## Running multiple simulations
 
-We now can also plot the results using the following function:
+We have implemented the following code to run multiple simulations in parallel
+
+```{r simul2, cache=T, eval=F}
+######### Number of simulations that we will perform #########
+TASKS = 1000
+
+PARAMS_RUN1 = lapply(1:TASKS,function(w) list(params))
+
+RUNS = run(
+  FUN = simulator,
+  PARAMS = PARAMS_RUN1,
+  silent = FALSE,
+  parallel = TRUE,
+  packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
+)
+```
+This will create a list of objects, each object corresponds to one simulation.
+
+## Visualization
+
+We  can also plot the results using the following function (after loading some libraries):
 
 ```{r visualize,message=F,warning=F}
+###Libraries for visualizing
+library(reshape2)
+library(tidygraph)
+library(ggraph)
+library(ggstatsplot)
+library(ggmuller)
+
+###Code to visualize results
   # Visualization
   if (count(M %>% dplyr::select(clone_id) %>% unique()) > 1) {
     p1 <-
