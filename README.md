@@ -53,10 +53,10 @@ params['Kcapacity'] = 500
 params['ps'] <- 0.5
 params['pdiff'] <- (1 - params['ps'])
 
-###### Set mutation rate parameter, the final mutation rate value used is equal to a combination of the following terms: u*L*C
+###### Set mutation rate parameter, the final mutation rate value used is equal to a combination of the following terms: u*C
 params['u'] = 1 /  (10 ^ 6) ### muts/ division / bp, mutation occurrence/ polymerase error
 params['L'] = 50 * (10 ^ 6) ### Length of the genome/exome size of exome syn plus nonsyn mutations
-params['C'] = 1 /  (10 ^ 2) ### damage repair correction efficiency, it allows only 1 out of X number of mutations to be preserved at each cell division
+params['C'] = 1 /  (10 ^ 2) ### damage repair correction efficiency, it allows only 1 out of 100 number of errors to be preserved at each cell division
 
 #######Set mutation probabilities
 params['pnad'] <- 0.01 #Nonsyn - driver mutations (increase proliferation rate, oncogenes/ reduce correction efficiency, mut_modifiers, decrease death rate, etc)
