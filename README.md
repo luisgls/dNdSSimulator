@@ -147,9 +147,12 @@ library(ggmuller)
 
   p1
 ```
-which produces the following figure:
-
+Wich produces the following figure
 https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial_files/figure-html/visualize-1.png
+
+## Tutorial
+
+The code shown above can albo be accessed here:
 
 https://htmlpreview.github.io/?https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial.html
 
