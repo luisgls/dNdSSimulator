@@ -151,6 +151,8 @@ which produces the following figure:
 
 https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial_files/figure-html/visualize-1.png
 
+https://htmlpreview.github.io/?https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial.html
+
 ## Citation
 
 If you want to use the simulator please cite the following article: 
