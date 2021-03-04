@@ -152,7 +152,7 @@ https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial_files/figure-h
 
 ## Tutorial
 
-The code shown above can albo be accessed here:
+The code shown above can also be accessed here:
 
 https://htmlpreview.github.io/?https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial.html
 
