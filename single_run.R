@@ -7,8 +7,9 @@ library(easypar)
 library(parallel)
 
 rm(list = ls())
-source('simulator.R')
+source('simulator_modelB.R')
 source("functions_ZCsimulator.R")
+source("simulator_plotting.R")
 
 set.seed(NULL)
 ######### Number of repetitions #########

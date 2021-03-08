@@ -17,7 +17,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include = FALSE,echo=F, warning=FALSE}
 # show me all columns
 options(tibble.width = Inf, pillar.bold = TRUE, pillar.subtle_num = TRUE)
 knitr::opts_chunk$set(
@@ -131,7 +131,7 @@ clone_I_id # Clone id assigned by immunogenic status
 parent_clone_id # Parental clone ID (driver status)
 ```
 
-We now can also plot the results using the following function:
+We now can also plot the results using the following function to visualize the clonal structure over time based on the acquisition of driver events, we can also track the global dN/dS obtained by taking all allive cells at each time point:
 
 ```{r visualize,message=F,warning=F}
   # Visualization
@@ -148,5 +148,57 @@ We now can also plot the results using the following function:
       )
   }
 
-  p1
+p1
+
 ```
+
+Another function to visualize dN/dS over time:
+
+```{r visualize2}
+
+#Visualize  dN/dS over time
+dnds_plot(M)
+
+
+```
+
+We can aggregate the values corresponding to the major clones on the population and see how their dN/dS fluctuate over time
+
+```{r}
+#Visualize dN/dS over time using major clones
+plot_clone_dnds(M)
+```
+
+## Running multiple simulations
+
+```{r multiple}
+TASKS=10
+
+PARAMS_RUN1 = lapply(1:TASKS,function(w) list(params))
+
+RUNS = run(
+  FUN = simulator,
+  PARAMS = PARAMS_RUN1,
+  silent = FALSE,
+  parallel = TRUE,
+  packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
+)
+```
+
+Here, each of the single simulations can be plotted as shown before, but now we are more interested on the global behavior of multiple simulations over time. So we can use the following functions to summarise data over time. 
+
+```{r multstats}
+
+stats_dnds(RUNS)
+
+evodevo(RUNS,4,500)
+
+```
+The first function tell us the dN/dS with the confidence interval by taking all mutations present in alive cells at each time point
+
+```{r getseq}
+all_genotypes<-lapply(RUNS,get_sequencing)
+
+calc_freq_dnds(RUNS,all_genotypes, freq = 0.05)
+```
+Here, you have a summary for each simulation, the number of the simulation, the last population size recorded, the time at which the last population size was recorded, the different nonsynonymous and synonymous mutations, the global, driver and immune dN/dS, and the cut-off frequency. 
