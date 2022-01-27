@@ -665,7 +665,7 @@ calc_freq_dnds<-function(x,sequencing,freq=0.01){
     summary_dnds_table = bind_rows(summary_dnds_table,temp_dnds_table)
     
   }
-  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table),]
+  summary_dnds_table<-summary_dnds_table[complete.cases(summary_dnds_table$simulation),]
   return(summary_dnds_table)
 }
 
@@ -785,7 +785,7 @@ get_lowCI_freq=function(x1,x2,n,m){
 
 ##get High CI
 get_highCI_freq=function(x1,x2,n,m){
-  library(dpcR)
+  #library(dpcR)
   z<-rateratio.test::rateratio.test(c(x1,x2),c(n,m))
   return(z$conf.int[2])
 }
@@ -794,3 +794,40 @@ get_highCI_freq=function(x1,x2,n,m){
 set_params<-function(x,mod,imm,esc){
   x <- x %>% mutate(model=mod,immune=imm,escape=esc)
 }  
+
+##New function to get clonal escape id and get runs with that data
+get_clonal_escape_simID=function(dnds_table,x){
+  summary_dnds_table=tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
+                            mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
+                            dnds_driver=NA,dnds_immune=NA,min_freq=NA,model=NA,immune=NA,escape=NA)
+  
+  temp_dnds_table=NULL
+  tmp_positive_clone = list()
+  #output_list = list()
+  for (i in 1:length(x)){
+    
+    if(unique(is.na(x[[i]][1]))){ 
+      #print(paste("No Sequencing data in simulation ",i,sep =""))
+      next}  
+    
+    
+    tmp_positive_clone[[i]]=x[[i]] %>% dplyr::filter(str_detect(sequencing_vec,"gnae")) %>% dplyr::filter(frequency>0.5)
+    
+    if(dplyr::count(tmp_positive_clone[[i]])>0){
+      ##Create temporary tibble
+      temp_dnds_table = tibble(simulation=NA,pop=NA,time=NA,mut_na=NA,mut_ns=NA,mut_nad=NA,
+                               mut_nsd=NA,mut_nai=NA,mut_nsi=NA,mut_nae=NA,dnds_global=NA,
+                               dnds_driver=NA,dnds_immune=NA,min_freq=NA,model=NA,immune=NA,escape=NA)
+      ##Fill temporary tibble
+      temp_dnds_table = dnds_table %>% dplyr::filter(simulation == i)
+      ##remove NA rows
+      summary_dnds_table = bind_rows(summary_dnds_table,temp_dnds_table)
+    }
+    
+    
+  }
+  summary_dnds_table <- summary_dnds_table %>% dplyr::filter(!is.na(simulation))
+  return(summary_dnds_table)
+}
+
+
