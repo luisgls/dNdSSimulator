@@ -176,17 +176,17 @@ playStrategy <- function(M, id, new_geno, parent_id)
     # immunogenic mutations increase the chance to be detected by the IS
     if(new_geno['gnai'] >= 1)
     {
-      newval2 = px + rgamma(1, 0.5, rate = 10)
+      newval2 = px + rbeta(1, 2, 8)
       if(newval2 > 1) newval2 = 1
       return(newval2)
     }
     # escape mutations decrease the probability to be detected by the IS
-    if(new_geno['gnae'] >= 1)
-    {
-      newval2 = 0 #- rgamma(1, 0.5, rate = 10)
-      if(newval2 < 0) newval2 = 0
-      return(newval2)
-    }
+    #if(new_geno['gnae'] >= 1)
+    #{
+     # newval2 = 0 #- rgamma(1, 0.5, rate = 10)
+    #  if(newval2 < 0) newval2 = 0
+    #  return(newval2)
+    #}
     else{
     return(NULL)
     }
@@ -255,7 +255,7 @@ set_immunedead1 = function(M, id, t, patak) {
            t_e = ifelse(id == !!id,  t, t_e))
 }
 
-##Kill a cell with an increasing probability given a probability of immune attack
+##Kill a cell with an increasing probability of immunogenicity depending on the number of immunogenic mutations given a probability of immune attack
 set_immunedead2 = function(M, id, t, patak) {
   M %>%
     mutate(alive = ifelse(id == !!id & pimmune > runif(1) & patak > runif(1) & gnae == 0,  FALSE, alive),
