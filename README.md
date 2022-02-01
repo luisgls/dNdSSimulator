@@ -24,6 +24,12 @@ source("simulator_plotting.R")
 ```
 *Note*:
 Libraries pio and easypar can be obtained from <https://caravagn.github.io/>
+Library ctree required for some function can be obtained using
+```{r install}
+install.packages("devtools")
+devtools::install_github("caravagnalab/ctree")
+
+```
 
 *Note*:
 If you want to run the second model where the immune system attacks a population of immunogenic cells, you must source simulator_modelB.R instead of simulator_modelA.R.
