@@ -24,7 +24,9 @@ source("simulator_plotting.R")
 ```
 *Note*:
 Libraries pio and easypar can be obtained from <https://caravagn.github.io/>
+
 Library ctree required for some function can be obtained using
+
 ```{r install}
 install.packages("devtools")
 devtools::install_github("caravagnalab/ctree")
