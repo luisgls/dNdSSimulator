@@ -402,6 +402,26 @@ chooseMuts <- function(M, id, a0, N) {
   g0
 }
 
+##Sample a set of new somatic mutations for a cell
+chooseMuts_immunodriver <- function(M, id, a0, N) {
+  pc <- get_prob(M, id)
+  ##Get a set of mutations based on the poisson of the expected
+  Muts <- sample(a0, rpois(1, N), prob = pc, replace = T)
+  
+  # 3.1.1) Check for immunogenic drivers and add them to the genotype
+  n_new=sum(Muts=="gnak")
+  Muts2<-c(Muts,rep("gnad",n_new))
+  Muts3<-c(Muts2,rep("gnai",n_new))
+  
+  g0 = get_geno(M, id)
+  g0[T] = 0
+  
+  g1 <- table(Muts3)
+  g0[names(g1)] = g1
+  g0
+}
+
+
 #Create a new cell from a parent cell
 create_cell = function(M, new_id, parent_id) {
   f = M %>% filter(id == !!parent_id)
@@ -424,7 +444,11 @@ simulate_daughter_cell = function(M, parent_id, t, a0, N) {
   
   # 3) New genotype for this cell (acquired mutations + old mutations)
   # 3.1) choose mutations from probability vector
-  new_geno = chooseMuts(M, new_cell_id, a0, N)
+  #new_geno = chooseMuts(M, new_cell_id, a0, N)
+  
+  # 3.1.1) choose mutations from probability vector including immunogenic drivers
+  new_geno = chooseMuts_immunodriver(M, new_cell_id, a0, N)
+  
   # 3.2)  get current genotype and sum with old
   g_somatic = get_geno(M, parent_id) + new_geno
   # 3.3) Update genotype in memory
