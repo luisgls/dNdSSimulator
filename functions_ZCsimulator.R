@@ -132,29 +132,30 @@ playStrategy <- function(M, id, new_geno, parent_id)
   ############################################# PHENOTYPE 1: Probability of survival ###################################################################
   #Function to modify the probability of survival of the clone
   ##Delta value for increasing or decreasing survival probability based on the number of driver events
-  #delta_decrease = 0
+  #
+  delta_decrease = 0
   #delta_increase = 0
   
-  delta_decrease = rgamma(1, 0.5, rate = 10)
+  #delta_decrease = rgamma(1, 0.5, rate = 10)
+  
+  
   x <- M %>% filter(id == !!id) %>% pull(gnad)
-  #Old
-  #delta_increase = ( 1/ (1+exp(1)^(-0.7*x) ) )/2 
-  #New(21-5-2019)
   delta_increase = gompertz(0.5,5,1,x)
   
   change_psurv = function(psurv) 
   {
     # deleterious reduce the probability of survival
-    if(new_geno['gnak'] >= 1) 
-    {
-      newval = psurv - delta_decrease
-      if(newval <= 0.001) newval = 0.001
-      return(newval)
-    }    
+    #if(new_geno['gnak'] >= 1) 
+    #{
+    #  newval = psurv - delta_decrease
+    #  if(newval <= 0.001) newval = 0.001
+    #  return(newval)
+    #}    
     # driver increases the probability of survival
     if(new_geno['gnad'] >= 1) 
     {
-      newval = psurv + delta_increase#/(M %>% filter(id == !!id) %>% pull(gnad))
+      newval = 0.5 + delta_increase
+      #/(M %>% filter(id == !!id) %>% pull(gnad))
       #if(newval >= 1) newval = 0.999
       return(newval)
     }
@@ -164,7 +165,7 @@ playStrategy <- function(M, id, new_geno, parent_id)
   psurv_parent = M %>% filter(id == !!parent_id) %>% pull(psurv)
    
   # True or false - is a new clone based on the psurv phenotype
-  is_new_clone_surv = (new_geno['gnak'] >= 1 | new_geno['gnad'] >= 1) & (psurv_parent < 0.999 | psurv_parent > 0.001 )
+  is_new_clone_surv = (new_geno['gnad'] >= 1) & (psurv_parent < 0.999 | psurv_parent > 0.001 )
   
   ######################################################################################################################################################
   ############################################# PHENOTYPE 2: Probability of immune attack ##############################################################
