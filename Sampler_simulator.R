@@ -1,12 +1,17 @@
-library(ggpubr)
-library(tidyverse)
-library(crayon)
-library(pio)
-library(easypar)
-library(parallel)
-source('simulator_modelA.R')
-source("functions_ZCsimulator.R")
-source("simulator_plotting.R")
+prepare = function()
+{
+  library(ggpubr)
+  library(tidyverse)
+  library(crayon)
+  library(pio)
+  library(easypar)
+  library(parallel)
+  source('simulator_modelA.R')
+  source("functions_ZCsimulator.R")
+  source("simulator_plotting.R")
+}
+
+prepare()
 
 ######## Grid of values
 
@@ -26,7 +31,10 @@ saveRDS(grid, 'grid.RDS')
 
 runner = function(i)
 {
+  prepare()
+
   grid = readRDS('grid.RDS')
+
   cli::cli_h3("Test {.field {i}} / {.value {nrow(grid)}}")
   TIME = as.POSIXct(Sys.time(), format = "%H:%M:%S")
 
@@ -89,10 +97,10 @@ runner = function(i)
 
 RUNS = run(
   FUN = simulator,
-  PARAMS = PARAMS_RUN1,
+  PARAMS = lapply(1:nrow(grid), list),
   silent = FALSE,
   parallel = TRUE,
-  packages = c("ggpubr","tidyverse","ggmuller","crayon","pio")
+  export = c("prepare")
 )
 
 
