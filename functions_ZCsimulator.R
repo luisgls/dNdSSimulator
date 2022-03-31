@@ -140,7 +140,11 @@ playStrategy <- function(M, id, new_geno, parent_id)
   
   
   x <- M %>% filter(id == !!id) %>% pull(gnad)
+  #GOMPERTZ FUNCTION FOR DRIVER EFFECT
   delta_increase = gompertz(0.5,5,1,x)
+  
+  #ANOTHER FUNCTION FOR DELTA EFFECT
+  ###
   
   change_psurv = function(psurv) 
   {
@@ -197,7 +201,7 @@ playStrategy <- function(M, id, new_geno, parent_id)
   pimmune_parent = M %>% filter(id == !!parent_id) %>% pull(pimmune)
   
   # True or false - is a new clone based on the pimmune phenotype
-  is_new_clone_immune = (new_geno['gnai'] == 1) & pimmune_parent == 0
+  is_new_clone_immune = (new_geno['gnai'] >= 1) #& pimmune_parent < 1
   
   #modify the phenotype
   M = M %>% 
