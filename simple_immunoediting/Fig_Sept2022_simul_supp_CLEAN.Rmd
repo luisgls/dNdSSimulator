@@ -1,0 +1,36 @@
+---
+title: "SimulationsNatGen"
+author: "Luis Zapata"
+date: "9/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggpubr)
+library(tidyverse)
+library(crayon)
+library(pio)
+library(easypar)
+library(parallel)
+rm(list=ls())
+```
+
+```{r load_simulations_100}
+load("~/tools/dNdSSimulator/example/Zapata22_NatGenExample.Rdata")
+```
+
+```{r analys_freq2}
+dnds_IA_100<-calc_freq_dnds(RUNS_IA_100,RUNS_IA_100_genotypes, freq = 0.01) %>% set_params(.,mod = "A",imm = "ACTIVE",esc = 0)
+
+dnds_IA_0<-calc_freq_dnds(RUNS_IA_0,RUNS_IA_0_genotypes, freq = 0.01) %>% set_params(.,mod = "A",imm = "INACTIVE",esc = 0)
+
+dnds_both<-bind_rows(dnds_IA_100,dnds_IA_0)
+```
+
+```{r plot_individuals,message=F,cache.comments=F}
+
+supp_fig1<-ggstatsplot::ggbetweenstats(dnds_both %>% filter(pop>1000), x = "immune", y = "dnds_immune",plot.type = "box", type = "np",ylab = "Immune dN/dS", xlab = "Immune system")
+supp_fig1
+
+```
