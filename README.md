@@ -164,6 +164,10 @@ The code shown above can also be accessed here:
 
 https://htmlpreview.github.io/?https://github.com/luisgls/dNdSSimulator/blob/master/dNdSTutorial.html
 
+## Example for Immune active versus Immune inactive simulation
+
+https://htmlpreview.github.io/?https://github.com/luisgls/dNdSSimulator/blob/master/example/Fig_Sept2022_simul_supp_CLEAN.html
+
 ## Citation
 
 If you want to use the simulator please cite the following article: 
