@@ -23,7 +23,7 @@ source("functions_ZCsimulator.R")
 source("simulator_plotting.R")
 ```
 *Note*:
-Libraries pio and easypar can be obtained from <https://caravagn.github.io/>
+Libraries pio and easypar can be obtained from <https://github.com/caravagn/>
 
 Library ctree required for some function can be obtained using
 
